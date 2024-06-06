@@ -1,9 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/joho/godotenv"
 )
 
 type Todo struct {
@@ -20,6 +23,14 @@ type UpdateTodo struct {
 func main() {
 	app := fiber.New()
 
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("Error loading .env file", err)
+	}
+
+	PORT := os.Getenv("PORT")
+
+	fmt.Println("Server running at http://localhost:" + PORT)
 	todos := []Todo{}
 
 	// Return the home page
@@ -119,5 +130,5 @@ func main() {
 		return c.Status(404).JSON(fiber.Map{"error": "Todo not found"})
 	})
 
-	log.Fatal(app.Listen(":8080"))
+	log.Fatal(app.Listen(":" + PORT))
 }
