@@ -96,23 +96,29 @@ func getTodos(c *fiber.Ctx) error {
 	return c.JSON(todos)
 }
 
-	// Create and return a new todo
-	app.Post("/api/todos", func(c *fiber.Ctx) error {
-		todo := &Todo{} // {id: 0, completed: false, body: ""}
+// Create and return a new todo
+func createTodo(c *fiber.Ctx) error {
+	todo := new(Todo) // {id: 0, completed: false, body: ""}
 
-		if err := c.BodyParser(todo); err != nil {
-			return err
-		}
+	if err := c.BodyParser(todo); err != nil {
+		return err
+	}
 
-		if todo.Body == "" {
-			return c.Status(400).JSON(fiber.Map{"error": "Body is required"})
-		}
+	if todo.Body == "" {
+		log.Print("Trying to create a todo without a body")
+		return c.Status(400).JSON(fiber.Map{"error": "Body is required"})
+	}
 
-		todo.ID = len(todos) + 1
-		todos = append(todos, *todo)
+	insertResult, err := collection.InsertOne(context.Background(), todo)
+	if err != nil {
+		log.Panic(err)
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
 
-		return c.Status(201).JSON(todo)
-	})
+	todo.ID = insertResult.InsertedID.(primitive.ObjectID)
+
+	return c.Status(201).JSON(todo)
+}
 
 	// Return a specific todo
 	app.Get("/api/todos/:id", func(c *fiber.Ctx) error {
