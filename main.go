@@ -40,7 +40,7 @@ func main() {
 	client, err := mongo.Connect(context.Background(), clientOptions)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Error connecting to MongoDB - ", err)
 	}
 
 	err = client.Ping(context.Background(), nil)
