@@ -142,36 +142,33 @@ func getTodo(c *fiber.Ctx) error {
 	return c.Status(200).JSON(fiber.Map{"message": todo})
 }
 
-	// Update a specific todo
-	app.Patch("/api/todos/:id", func(c *fiber.Ctx) error {
-		id, err := c.ParamsInt("id")
+// Update a specific todo
+func updateTodo(c *fiber.Ctx) error {
+	id := c.Params("id")
+	objectId, err := primitive.ObjectIDFromHex(id)
 
-		if err != nil {
-			return c.Status(400).JSON(fiber.Map{"error": "Invalid ID"})
-		}
+	if err != nil {
+		log.Panic(err)
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid ID"})
+	}
 
-		var updateData UpdateTodo
+	var updateData UpdateTodo
 
-		if err := c.BodyParser(&updateData); err != nil {
-			return err
-		}
+	if err := c.BodyParser(&updateData); err != nil {
+		return err
+	}
 
-		for i, todo := range todos {
-			if todo.ID == id {
-				if updateData.Completed != nil {
-					todos[i].Completed = *updateData.Completed
-				}
+	filter := bson.M{"_id": objectId}
+	update := bson.M{"$set": bson.M{"completed": updateData.Completed, "body": updateData.Body}}
 
-				if updateData.Body != nil {
-					if *updateData.Body == "" {
-						return c.Status(400).JSON(fiber.Map{"error": "Body is required"})
-					}
-					todos[i].Body = *updateData.Body
-				}
+	_, err = collection.UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		log.Panic(err)
+		return err
+	}
 
-				return c.Status(200).JSON(todos[i])
-			}
-		}
+	return c.Status(200).JSON(fiber.Map{"message": "Todo updated"})
+}
 
 		return c.Status(404).JSON(fiber.Map{"error": "Todo not found"})
 	})
