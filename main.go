@@ -71,11 +71,30 @@ func main() {
 	log.Fatal(app.Listen("0.0.0.0:" + PORT));
 }
 
+// Return an array of all todos
+func getTodos(c *fiber.Ctx) error {
+	var todos []Todo
 
-	// Return an array of all todos
-	app.Get("/api/todos", func(c *fiber.Ctx) error {
-		return c.Status(200).JSON(todos)
-	})
+	cursor, err := collection.Find(context.Background(), bson.M{})
+
+	if err != nil {
+		log.Panic(err)
+		return err
+	}
+
+	defer cursor.Close(context.Background())
+
+	for cursor.Next(context.Background()) {
+		var todo Todo
+		if err := cursor.Decode(&todo); err != nil {
+			log.Panic(err)
+			return err
+		}
+		todos = append(todos, todo)
+	}
+
+	return c.JSON(todos)
+}
 
 	// Create and return a new todo
 	app.Post("/api/todos", func(c *fiber.Ctx) error {
