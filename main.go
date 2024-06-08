@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
@@ -160,7 +161,22 @@ func updateTodo(c *fiber.Ctx) error {
 	}
 
 	filter := bson.M{"_id": objectId}
-	update := bson.M{"$set": bson.M{"completed": updateData.Completed, "body": updateData.Body}}
+	update := bson.M{"$set": bson.M{}}
+
+	if updateData.Completed != nil {
+		update["$set"].(bson.M)["completed"] = *updateData.Completed
+	}
+
+	if updateData.Body != nil && *updateData.Body != "" {
+		trimmedBody := strings.TrimSpace(*updateData.Body)
+		if trimmedBody != "" {
+			update["$set"].(bson.M)["body"] = trimmedBody
+		}
+	}
+
+	if len(update["$set"].(bson.M)) == 0 {
+		return c.Status(400).JSON(fiber.Map{"error": "Nothing to update"})
+	}
 
 	_, err = collection.UpdateOne(context.Background(), filter, update)
 	if err != nil {
