@@ -1,16 +1,19 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Todo struct {
-	ID        int    `json:"id"`
+	ID        int    `json:"id" bson:"_id"`
 	Completed bool   `json:"completed"`
 	Body      string `json:"body"`
 }
@@ -20,23 +23,52 @@ type UpdateTodo struct {
 	Body      *string `json:"body"`
 }
 
-func main() {
-	app := fiber.New()
+var collection *mongo.Collection
 
+func main() {
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal("Error loading .env file", err)
 	}
 
 	PORT := os.Getenv("PORT")
+	MONGODB_URI := os.Getenv("MONGODB_URI")
 
+	clientOptions := options.Client().ApplyURI(MONGODB_URI)
+	client, err := mongo.Connect(context.Background(), clientOptions)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = client.Ping(context.Background(), nil)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 	fmt.Println("Server running at http://localhost:" + PORT)
-	todos := []Todo{}
+	fmt.Println("Connected to MongoDB Atlas!")
 
-	// Return the home page
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.Status(200).JSON(fiber.Map{"msg": "Hello, World!"})
-	})
+	collection = client.Database("todo_go_db").Collection("todos")
+
+	app := fiber.New()
+
+	app.Get("/api/todos", getTodos)
+	app.Post("/api/todos", createTodo)
+	app.Patch("api/todos/:id", updateTodo)
+	app.Delete("api/todos/:id", deleteTodo)
+
+	if PORT == "" {
+		PORT = "8080"
+	}
+
+	if os.Getenv("ENV") == "production" {
+		app.Static("/", "./client/dist")
+	}
+
+	log.Fatal(app.Listen("0.0.0.0:" + PORT));
+}
+
 
 	// Return an array of all todos
 	app.Get("/api/todos", func(c *fiber.Ctx) error {
