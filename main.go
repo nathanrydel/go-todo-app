@@ -120,22 +120,27 @@ func createTodo(c *fiber.Ctx) error {
 	return c.Status(201).JSON(todo)
 }
 
-	// Return a specific todo
-	app.Get("/api/todos/:id", func(c *fiber.Ctx) error {
-		id, err := c.ParamsInt("id")
+// Return a specific todo
+func getTodo(c *fiber.Ctx) error {
+	id := c.Params("id")
+	objectId, err := primitive.ObjectIDFromHex(id)
 
-		if err != nil {
-			return c.Status(400).JSON(fiber.Map{"error": "Invalid ID"})
-		}
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid ID"})
+	}
 
-		for _, todo := range todos {
-			if todo.ID == id {
-				return c.Status(200).JSON(todo)
-			}
-		}
+	var todo Todo
 
+	filter := bson.M{"_id": objectId}
+
+	err = collection.FindOne(context.Background(), filter).Decode(&todo)
+
+	if err != nil {
 		return c.Status(404).JSON(fiber.Map{"error": "Todo not found"})
-	})
+	}
+
+	return c.Status(200).JSON(fiber.Map{"message": todo})
+}
 
 	// Update a specific todo
 	app.Patch("/api/todos/:id", func(c *fiber.Ctx) error {
