@@ -1,34 +1,36 @@
 # Go Todo App
 
-This is a simple Todo API built with Go and Fiber. It allows users to create, read, update, and delete todo items.
+This is a monorepo of simple Todo API built with Go and Fiber with the frontend being built with React and TypeScript. It allows users to create, read, update, and delete todo items and have todo persistence using Mongo DB.
 
 ## Prerequisites
 
 - Go 1.22.3 or later
 - Git
+- MongoDB
 
 ## Getting Started
 
 ### Installation
 
-1. Clone the repository:
+Clone the repository:
 
-   ```bash
-   git clone https://github.com/nathanrydel/go-todo-app.git
-   cd go-todo-app
-   ```
+```bash
+git clone https://github.com/nathanrydel/go-todo-app.git
+cd go-todo-app
+```
 
-2. Install dependencies:
+Install dependencies:
 
-   ```bash
-   go mod tidy
-   ```
+```bash
+go mod tidy
+```
 
-3. Create a `.env` file in the root directory and add the following line:
+Create a `.env` file in the root directory and add the following lines:
 
-   ```env
-   PORT=8080
-   ```
+```plaintext
+PORT=8080
+MONGODB_URI=your_mongodb_connection_string
+```
 
 ### Running the Application
 
@@ -44,8 +46,8 @@ The server will start running at `http://localhost:8080`.
 
 ### Get Home Page
 
-- **URL:** `/`
-- **Method:** `GET`
+- **URL:** /
+- **Method:** GET
 - **Response:**
   ```json
   {
@@ -55,13 +57,13 @@ The server will start running at `http://localhost:8080`.
 
 ### Get All Todos
 
-- **URL:** `/api/todos`
-- **Method:** `GET`
+- **URL:** /api/todos
+- **Method:** GET
 - **Response:** An array of todo objects
   ```json
   [
     {
-      "id": 1,
+      "id": "60c72b2f9b1d8b3b5c8f9d9a",
       "completed": false,
       "body": "Sample todo"
     }
@@ -70,8 +72,8 @@ The server will start running at `http://localhost:8080`.
 
 ### Create a New Todo
 
-- **URL:** `/api/todos`
-- **Method:** `POST`
+- **URL:** /api/todos
+- **Method:** POST
 - **Request Body:**
   ```json
   {
@@ -81,7 +83,7 @@ The server will start running at `http://localhost:8080`.
 - **Response:** The created todo object
   ```json
   {
-    "id": 1,
+    "id": "60c72b2f9b1d8b3b5c8f9d9a",
     "completed": false,
     "body": "New todo item"
   }
@@ -89,12 +91,12 @@ The server will start running at `http://localhost:8080`.
 
 ### Get a Specific Todo
 
-- **URL:** `/api/todos/:id`
-- **Method:** `GET`
+- **URL:** /api/todos/:id
+- **Method:** GET
 - **Response:** The requested todo object
   ```json
   {
-    "id": 1,
+    "id": "60c72b2f9b1d8b3b5c8f9d9a",
     "completed": false,
     "body": "Sample todo"
   }
@@ -102,8 +104,8 @@ The server will start running at `http://localhost:8080`.
 
 ### Update a Specific Todo
 
-- **URL:** `/api/todos/:id`
-- **Method:** `PATCH`
+- **URL:** /api/todos/:id
+- **Method:** PATCH
 - **Request Body:** One or both of the following fields
   ```json
   {
@@ -114,7 +116,7 @@ The server will start running at `http://localhost:8080`.
 - **Response:** The updated todo object
   ```json
   {
-    "id": 1,
+    "id": "60c72b2f9b1d8b3b5c8f9d9a",
     "completed": true,
     "body": "Updated todo item"
   }
@@ -122,8 +124,8 @@ The server will start running at `http://localhost:8080`.
 
 ### Delete a Specific Todo
 
-- **URL:** `/api/todos/:id`
-- **Method:** `DELETE`
+- **URL:** /api/todos/:id
+- **Method:** DELETE
 - **Response:**
   ```json
   {
@@ -134,25 +136,24 @@ The server will start running at `http://localhost:8080`.
 ## Environment Variables
 
 - `PORT`: The port number on which the server will run. This should be specified in a `.env` file.
+- `MONGODB_URI`: The connection string for the MongoDB database.
 
 ## Dependencies
 
-- [Fiber v2](https://github.com/gofiber/fiber)
-- [godotenv](https://github.com/joho/godotenv)
-
-### Indirect Dependencies
-
-Listed in `go.mod` file as indirect dependencies.
+- Fiber v2
+- godotenv
+- MongoDB Go Driver
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the LICENSE file for details.
 
 ## Acknowledgements
 
 This project uses the following open-source packages:
 
-- [Fiber](https://github.com/gofiber/fiber)
-- [godotenv](https://github.com/joho/godotenv)
+- Fiber
+- godotenv
+- MongoDB Go Driver
 
 ---
