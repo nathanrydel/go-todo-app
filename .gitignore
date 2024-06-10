@@ -5,6 +5,7 @@
 *.so
 *.dylib
 *.test
+.vite
 
 # Output of the go coverage tool
 *.out
