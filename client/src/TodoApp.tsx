@@ -5,6 +5,7 @@ import { Header } from '@/components/Header';
 import { TaskInput } from "@/components/TaskInput";
 import { TaskItem } from "@/components/TaskItem";
 import axios from 'axios'; // For API requests
+import { TodoSkeleton } from './components/TaskSkeleton';
 
 interface Task {
   _id: string;
@@ -53,7 +54,7 @@ const TodoApp: React.FC = () => {
 
     try {
       //! TODO: Remove hardcoded API endpoint
-      const response = await axios.patch(`http://localhost:8080/api/todos/${id}`, {
+      await axios.patch(`http://localhost:8080/api/todos/${id}`, {
         completed: !taskToUpdate.completed,
       });
       setTasks(tasks.map(task => (task._id === id ? { ...task, completed: !task.completed } : task)));
@@ -79,9 +80,8 @@ const TodoApp: React.FC = () => {
         <CardContent>
           <TaskInput onAddTask={addTask} />
           <h2 className="text-xl font-semibold mb-4 text-cyan-400">TODAY'S TASKS</h2>
-          {/*//! TODO: Add in skeletons */}
           {loading ? (
-            <p>Loading...</p> // This is where you can return skeleton components for loading
+            <TodoSkeleton count={3} />
           ) : tasks.length === 0 ? (
             <p>No tasks yet.</p>
           ) : (
