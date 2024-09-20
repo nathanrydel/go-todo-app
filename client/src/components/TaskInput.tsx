@@ -21,7 +21,7 @@ export const TaskInput: React.FC<TaskInputProps> = ({ onAddTask }) => {
     <div className="flex space-x-2 mb-4">
       <Input
         type="text"
-        placeholder="Buy Groceries"
+        placeholder="There's something I GoTodo..."
         value={newTask}
         onChange={(e) => setNewTask(e.target.value)}
       />
