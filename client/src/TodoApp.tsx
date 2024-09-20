@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '@/hooks/useTheme'; // Custom hook for theme
-import { Button } from "@/components/ui/button";
-import { SunMoon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { TaskInput } from "./components/TaskInput";
-import { TaskItem } from "./components/TaskItem";
+import { Header } from '@/components/Header';
+import { TaskInput } from "@/components/TaskInput";
+import { TaskItem } from "@/components/TaskItem";
 import axios from 'axios'; // For API requests
 
 interface Task {
@@ -18,10 +17,11 @@ const TodoApp: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]); // Fetch tasks from backend
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Fetch todos from the Go backend
+  // Fetch todos from the backend
   const fetchTodos = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/todos'); // Go API endpoint
+      //! TODO: Remove hardcoded API endpoint
+      const response = await axios.get('http://localhost:8080/api/todos');
       setTasks(response.data);
     } catch (error) {
       console.error('Error fetching todos:', error);
@@ -36,6 +36,7 @@ const TodoApp: React.FC = () => {
 
   const addTask = async (newTask: string) => {
     try {
+      //! TODO: Remove hardcoded API endpoint
       const response = await axios.post('http://localhost:8080/api/todos', {
         body: newTask,
         completed: false,
@@ -51,6 +52,7 @@ const TodoApp: React.FC = () => {
     if (!taskToUpdate) return;
 
     try {
+      //! TODO: Remove hardcoded API endpoint
       const response = await axios.patch(`http://localhost:8080/api/todos/${id}`, {
         completed: !taskToUpdate.completed,
       });
@@ -62,6 +64,7 @@ const TodoApp: React.FC = () => {
 
   const deleteTask = async (id: string) => {
     try {
+      //! TODO: Remove hardcoded API endpoint
       await axios.delete(`http://localhost:8080/api/todos/${id}`);
       setTasks(tasks.filter(task => task._id !== id));
     } catch (error) {
@@ -71,16 +74,12 @@ const TodoApp: React.FC = () => {
 
   return (
     <div className={`min-h-screen p-4 ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
+      <Header toggleTheme={toggleTheme} />
       <Card className="max-w-md mx-auto">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl">Daily Tasks</h1>
-          <Button variant="ghost" size="icon" onClick={toggleTheme}>
-            <SunMoon className="h-5 w-5" />
-          </Button>
-        </div>
         <CardContent>
           <TaskInput onAddTask={addTask} />
           <h2 className="text-xl font-semibold mb-4 text-cyan-400">TODAY'S TASKS</h2>
+          {/*//! TODO: Add in skeletons */}
           {loading ? (
             <p>Loading...</p> // This is where you can return skeleton components for loading
           ) : tasks.length === 0 ? (
@@ -89,9 +88,11 @@ const TodoApp: React.FC = () => {
             tasks.map(task => (
               <TaskItem
                 key={task._id}
-                _id={task._id}
+                id={task._id}
                 title={task.body}
                 completed={task.completed}
+                onToggleTask={toggleTask}
+                onDeleteTask={deleteTask}
               />
             ))
           )}
