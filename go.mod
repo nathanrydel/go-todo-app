@@ -2,7 +2,7 @@ module github.com/nathanrydel/go-todo-app
 
 go 1.22.3
 
-require github.com/gofiber/fiber/v2 v2.52.4 // direct
+require github.com/gofiber/fiber/v2 v2.52.5 // direct
 
 require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
